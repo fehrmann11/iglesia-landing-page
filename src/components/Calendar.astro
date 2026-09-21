@@ -1,0 +1,370 @@
+---
+// Placeholder/sample dates for visualization purposes — replace with real activities.
+interface CalendarEvent {
+	day: number;
+	month: string;
+	weekday: string;
+	time: string;
+	title: string;
+}
+
+const events: CalendarEvent[] = [
+	{ day: 22, month: 'Sep', weekday: 'Martes', time: '19:00', title: 'Noche de Oración' },
+	{ day: 23, month: 'Sep', weekday: 'Miércoles', time: '19:00', title: 'Reunión de Mujeres' },
+	{ day: 25, month: 'Sep', weekday: 'Viernes', time: '19:30', title: 'Reunión de Jóvenes' },
+	{ day: 26, month: 'Sep', weekday: 'Sábado', time: '16:00', title: 'Mesa Kids' },
+	{ day: 27, month: 'Sep', weekday: 'Domingo', time: '11:00', title: 'Reunión General' },
+];
+
+// Grid view: build a real September 2026 month grid (Monday-first) from the same events.
+const YEAR = 2026;
+const MONTH_INDEX = 8; // September
+const TODAY = 21;
+
+const eventsByDay = new Map<number, CalendarEvent[]>();
+for (const event of events) {
+	const list = eventsByDay.get(event.day) ?? [];
+	list.push(event);
+	eventsByDay.set(event.day, list);
+}
+
+const daysInMonth = new Date(YEAR, MONTH_INDEX + 1, 0).getDate();
+const firstWeekdaySunFirst = new Date(YEAR, MONTH_INDEX, 1).getDay();
+const firstWeekdayMonFirst = (firstWeekdaySunFirst + 6) % 7;
+
+const weeks: (number | null)[][] = [];
+let week: (number | null)[] = new Array(firstWeekdayMonFirst).fill(null);
+for (let day = 1; day <= daysInMonth; day++) {
+	week.push(day);
+	if (week.length === 7) {
+		weeks.push(week);
+		week = [];
+	}
+}
+if (week.length > 0) {
+	while (week.length < 7) week.push(null);
+	weeks.push(week);
+}
+
+const weekdayLabels = ['Lu', 'Ma', 'Mi', 'Ju', 'Vi', 'Sá', 'Do'];
+---
+
+<section class="calendar" id="calendario">
+	<h2 class="calendar__title">Próximas Actividades</h2>
+	<p class="calendar__intro">No te pierdas lo que viene esta semana.</p>
+
+	<ul class="calendar__list" id="calendar-list-view">
+		{
+			events.map((event) => (
+				<li class="calendar-item">
+					<div class="calendar-item__date">
+						<span class="calendar-item__day">{event.day}</span>
+						<span class="calendar-item__month">{event.month}</span>
+					</div>
+					<div class="calendar-item__info">
+						<p class="calendar-item__title">{event.title}</p>
+						<p class="calendar-item__meta">
+							{event.weekday} · {event.time} hrs
+						</p>
+					</div>
+				</li>
+			))
+		}
+	</ul>
+
+	<div class="calendar__grid-view" id="calendar-grid-view" hidden>
+		<p class="calendar__grid-month">Septiembre {YEAR}</p>
+		<div class="calendar-grid">
+			{weekdayLabels.map((label) => <div class="calendar-grid__weekday">{label}</div>)}
+			{
+				weeks.map((weekRow) =>
+					weekRow.map((day) => {
+						const dayEvents = day ? eventsByDay.get(day) : undefined;
+						const isToday = day === TODAY;
+						return (
+							<div
+								class:list={[
+									'calendar-grid__day',
+									{ 'calendar-grid__day--empty': day === null },
+									{ 'calendar-grid__day--today': isToday },
+									{ 'calendar-grid__day--has-event': !!dayEvents },
+								]}
+								tabindex={dayEvents ? 0 : undefined}
+							>
+								{day !== null && <span class="calendar-grid__day-number">{day}</span>}
+								{dayEvents && <span class="calendar-grid__dot" aria-hidden="true" />}
+								{dayEvents && (
+									<div class="calendar-grid__popover" role="tooltip">
+										{dayEvents.map((event) => (
+											<p class="calendar-grid__popover-item">
+												<strong>{event.title}</strong>
+												<br />
+												{event.time} hrs
+											</p>
+										))}
+									</div>
+								)}
+							</div>
+						);
+					})
+				)
+			}
+		</div>
+		<p class="calendar__grid-legend">
+			<span class="calendar__grid-legend-dot" aria-hidden="true" /> Día con actividad
+		</p>
+	</div>
+
+	<button type="button" class="calendar__toggle" id="calendar-toggle">
+		Ver como calendario 📅
+	</button>
+</section>
+
+<script>
+	const listView = document.getElementById('calendar-list-view');
+	const gridView = document.getElementById('calendar-grid-view');
+	const toggleButton = document.getElementById('calendar-toggle');
+
+	toggleButton?.addEventListener('click', () => {
+		const showingGrid = !gridView?.hidden;
+		if (listView) listView.hidden = !showingGrid;
+		if (gridView) gridView.hidden = showingGrid;
+		if (toggleButton) {
+			toggleButton.textContent = showingGrid ? 'Ver como calendario 📅' : 'Ver como lista 📋';
+		}
+	});
+</script>
+
+<style>
+	.calendar {
+		max-width: 700px;
+		margin: 0 auto;
+		text-align: center;
+	}
+
+	.calendar__title {
+		margin: 0 0 0.5rem;
+		font-size: 1.75rem;
+		font-weight: 700;
+		color: #1a1a1a;
+	}
+
+	.calendar__intro {
+		margin: 0 0 2rem;
+		color: #555555;
+		font-size: 1rem;
+	}
+
+	.calendar__list {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		flex-direction: column;
+		gap: 0.75rem;
+		text-align: left;
+	}
+
+	.calendar__list:not([hidden]) {
+		display: flex;
+	}
+
+	.calendar-item {
+		display: flex;
+		align-items: center;
+		gap: 1rem;
+		border: 1px solid #eadfdf;
+		border-radius: 12px;
+		padding: 0.85rem 1.25rem;
+		background: #fffaf9;
+	}
+
+	.calendar-item__date {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		flex-shrink: 0;
+		width: 56px;
+		height: 56px;
+		border-radius: 10px;
+		background: #8a1c2b;
+		color: #ffffff;
+	}
+
+	.calendar-item__day {
+		font-size: 1.15rem;
+		font-weight: 700;
+		line-height: 1;
+	}
+
+	.calendar-item__month {
+		font-size: 0.7rem;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+	}
+
+	.calendar-item__title {
+		margin: 0;
+		font-size: 1rem;
+		font-weight: 700;
+		color: #1a1a1a;
+	}
+
+	.calendar-item__meta {
+		margin: 0.15rem 0 0;
+		font-size: 0.85rem;
+		color: #666666;
+	}
+
+	.calendar__toggle {
+		margin-top: 1.5rem;
+		padding: 0.65rem 1.5rem;
+		font-size: 0.95rem;
+		font-weight: 600;
+		color: #8a1c2b;
+		background: #fffaf9;
+		border: 1px solid #8a1c2b;
+		border-radius: 999px;
+		cursor: pointer;
+	}
+
+	.calendar__toggle:hover {
+		background: #8a1c2b;
+		color: #ffffff;
+	}
+
+	.calendar__grid-view {
+		text-align: left;
+	}
+
+	.calendar__grid-month {
+		margin: 0 0 0.75rem;
+		font-weight: 700;
+		text-align: center;
+		color: #1a1a1a;
+	}
+
+	.calendar-grid {
+		display: grid;
+		grid-template-columns: repeat(7, 1fr);
+		gap: 4px;
+	}
+
+	.calendar-grid__weekday {
+		text-align: center;
+		font-size: 0.75rem;
+		font-weight: 700;
+		color: #8a1c2b;
+		padding-bottom: 0.35rem;
+	}
+
+	.calendar-grid__day {
+		position: relative;
+		aspect-ratio: 1;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		border-radius: 8px;
+		background: #fffaf9;
+		border: 1px solid #f0e6e6;
+		font-size: 0.8rem;
+		color: #333333;
+	}
+
+	.calendar-grid__day--has-event {
+		cursor: pointer;
+	}
+
+	.calendar-grid__popover {
+		position: absolute;
+		bottom: calc(100% + 8px);
+		left: 50%;
+		transform: translateX(-50%) translateY(4px);
+		z-index: 10;
+		min-width: 160px;
+		max-width: 220px;
+		padding: 0.6rem 0.75rem;
+		border-radius: 10px;
+		background: #2a1414;
+		color: #ffffff;
+		text-align: left;
+		font-size: 0.8rem;
+		line-height: 1.4;
+		box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+		opacity: 0;
+		visibility: hidden;
+		pointer-events: none;
+		transition:
+			opacity 0.15s ease,
+			transform 0.15s ease;
+	}
+
+	.calendar-grid__popover::after {
+		content: '';
+		position: absolute;
+		top: 100%;
+		left: 50%;
+		transform: translateX(-50%);
+		border: 6px solid transparent;
+		border-top-color: #2a1414;
+	}
+
+	.calendar-grid__popover-item {
+		margin: 0;
+	}
+
+	.calendar-grid__popover-item + .calendar-grid__popover-item {
+		margin-top: 0.4rem;
+		padding-top: 0.4rem;
+		border-top: 1px solid rgba(255, 255, 255, 0.15);
+	}
+
+	.calendar-grid__day--has-event:hover .calendar-grid__popover,
+	.calendar-grid__day--has-event:focus-visible .calendar-grid__popover {
+		opacity: 1;
+		visibility: visible;
+		transform: translateX(-50%) translateY(0);
+	}
+
+	.calendar-grid__day--empty {
+		background: transparent;
+		border-color: transparent;
+	}
+
+	.calendar-grid__day--today {
+		border-color: #8a1c2b;
+		border-width: 2px;
+		font-weight: 700;
+	}
+
+	.calendar-grid__day--has-event {
+		background: #f6e4e6;
+	}
+
+	.calendar-grid__dot {
+		width: 5px;
+		height: 5px;
+		border-radius: 50%;
+		background: #8a1c2b;
+		margin-top: 2px;
+	}
+
+	.calendar__grid-legend {
+		display: flex;
+		align-items: center;
+		gap: 0.4rem;
+		justify-content: center;
+		margin: 0.85rem 0 0;
+		font-size: 0.8rem;
+		color: #666666;
+	}
+
+	.calendar__grid-legend-dot {
+		width: 8px;
+		height: 8px;
+		border-radius: 50%;
+		background: #8a1c2b;
+		display: inline-block;
+	}
+</style>
