@@ -1,0 +1,119 @@
+---
+interface Ministry {
+	name: string;
+	description: string;
+	schedule: string;
+}
+
+const ministries: Ministry[] = [
+	{
+		name: 'Reunión General',
+		description:
+			'Nuestro encuentro principal de toda la congregación: alabanza, predicación y comunión.',
+		schedule: 'Consulta horarios',
+	},
+	{
+		name: 'Mesa Kids',
+		description:
+			'Un espacio especialmente diseñado para que los más pequeños aprendan y se diviertan mientras conocen de Dios.',
+		schedule: 'Consulta horarios',
+	},
+	{
+		name: 'Reunión de Jóvenes',
+		description: 'Un espacio para jóvenes: adoración, estudio bíblico y comunidad.',
+		schedule: 'Consulta horarios',
+	},
+	{
+		name: 'Reunión de Mujeres',
+		description:
+			'Un espacio de comunión, oración y crecimiento espiritual para las mujeres de la iglesia.',
+		schedule: 'Consulta horarios',
+	},
+];
+---
+
+<section class="ministries" id="ministerios">
+	<h2 class="ministries__title">Nuestros Ministerios</h2>
+	<p class="ministries__intro">Hay un lugar para ti en cada etapa de tu vida.</p>
+
+	<div class="ministries__grid">
+		{
+			ministries.map((ministry) => (
+				<article class="ministry-card">
+					<h3 class="ministry-card__name">{ministry.name}</h3>
+					<p class="ministry-card__description">{ministry.description}</p>
+					<p class="ministry-card__schedule">{ministry.schedule}</p>
+				</article>
+			))
+		}
+	</div>
+</section>
+
+<style>
+	.ministries {
+		max-width: 1100px;
+		margin: 0 auto;
+		text-align: center;
+	}
+
+	.ministries__title {
+		margin: 0 0 0.5rem;
+		font-size: 1.75rem;
+		font-weight: 700;
+		color: #1a1a1a;
+	}
+
+	.ministries__intro {
+		margin: 0 0 2rem;
+		color: #555555;
+		font-size: 1rem;
+	}
+
+	.ministries__grid {
+		display: grid;
+		grid-template-columns: 1fr;
+		gap: 1.25rem;
+		text-align: left;
+	}
+
+	.ministry-card {
+		border: 1px solid #eadfdf;
+		border-radius: 12px;
+		padding: 1.5rem;
+		background: #fffaf9;
+		border-top: 4px solid #8a1c2b;
+	}
+
+	.ministry-card__name {
+		margin: 0 0 0.5rem;
+		font-size: 1.15rem;
+		font-weight: 700;
+		color: #1a1a1a;
+	}
+
+	.ministry-card__description {
+		margin: 0 0 0.75rem;
+		font-size: 0.95rem;
+		line-height: 1.5;
+		color: #444444;
+	}
+
+	.ministry-card__schedule {
+		margin: 0;
+		font-size: 0.85rem;
+		font-weight: 600;
+		color: #8a1c2b;
+	}
+
+	@media (min-width: 640px) {
+		.ministries__grid {
+			grid-template-columns: repeat(2, 1fr);
+		}
+	}
+
+	@media (min-width: 1024px) {
+		.ministries__grid {
+			grid-template-columns: repeat(4, 1fr);
+		}
+	}
+</style>
