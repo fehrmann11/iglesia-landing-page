@@ -1,7 +1,7 @@
 ---
 // Placeholder/sample dates for visualization purposes — replace with real activities.
 interface CalendarEvent {
-	day: string;
+	day: number;
 	month: string;
 	weekday: string;
 	time: string;
@@ -9,19 +9,51 @@ interface CalendarEvent {
 }
 
 const events: CalendarEvent[] = [
-	{ day: '23', month: 'Sep', weekday: 'Martes', time: '19:00', title: 'Reunión de Mujeres' },
-	{ day: '26', month: 'Sep', weekday: 'Viernes', time: '19:30', title: 'Reunión de Jóvenes' },
-	{ day: '27', month: 'Sep', weekday: 'Sábado', time: '16:00', title: 'Mesa Kids' },
-	{ day: '28', month: 'Sep', weekday: 'Domingo', time: '11:00', title: 'Reunión General' },
-	{ day: '30', month: 'Sep', weekday: 'Martes', time: '19:00', title: 'Noche de Oración' },
+	{ day: 22, month: 'Sep', weekday: 'Martes', time: '19:00', title: 'Noche de Oración' },
+	{ day: 23, month: 'Sep', weekday: 'Miércoles', time: '19:00', title: 'Reunión de Mujeres' },
+	{ day: 25, month: 'Sep', weekday: 'Viernes', time: '19:30', title: 'Reunión de Jóvenes' },
+	{ day: 26, month: 'Sep', weekday: 'Sábado', time: '16:00', title: 'Mesa Kids' },
+	{ day: 27, month: 'Sep', weekday: 'Domingo', time: '11:00', title: 'Reunión General' },
 ];
+
+// Grid view: build a real September 2026 month grid (Monday-first) from the same events.
+const YEAR = 2026;
+const MONTH_INDEX = 8; // September
+const TODAY = 21;
+
+const eventsByDay = new Map<number, CalendarEvent[]>();
+for (const event of events) {
+	const list = eventsByDay.get(event.day) ?? [];
+	list.push(event);
+	eventsByDay.set(event.day, list);
+}
+
+const daysInMonth = new Date(YEAR, MONTH_INDEX + 1, 0).getDate();
+const firstWeekdaySunFirst = new Date(YEAR, MONTH_INDEX, 1).getDay();
+const firstWeekdayMonFirst = (firstWeekdaySunFirst + 6) % 7;
+
+const weeks: (number | null)[][] = [];
+let week: (number | null)[] = new Array(firstWeekdayMonFirst).fill(null);
+for (let day = 1; day <= daysInMonth; day++) {
+	week.push(day);
+	if (week.length === 7) {
+		weeks.push(week);
+		week = [];
+	}
+}
+if (week.length > 0) {
+	while (week.length < 7) week.push(null);
+	weeks.push(week);
+}
+
+const weekdayLabels = ['Lu', 'Ma', 'Mi', 'Ju', 'Vi', 'Sá', 'Do'];
 ---
 
 <section class="calendar" id="calendario">
 	<h2 class="calendar__title">Próximas Actividades</h2>
 	<p class="calendar__intro">No te pierdas lo que viene esta semana.</p>
 
-	<ul class="calendar__list">
+	<ul class="calendar__list" id="calendar-list-view">
 		{
 			events.map((event) => (
 				<li class="calendar-item">
@@ -39,7 +71,58 @@ const events: CalendarEvent[] = [
 			))
 		}
 	</ul>
+
+	<div class="calendar__grid-view" id="calendar-grid-view" hidden>
+		<p class="calendar__grid-month">Septiembre {YEAR}</p>
+		<div class="calendar-grid">
+			{weekdayLabels.map((label) => <div class="calendar-grid__weekday">{label}</div>)}
+			{
+				weeks.map((weekRow) =>
+					weekRow.map((day) => {
+						const dayEvents = day ? eventsByDay.get(day) : undefined;
+						const isToday = day === TODAY;
+						return (
+							<div
+								class:list={[
+									'calendar-grid__day',
+									{ 'calendar-grid__day--empty': day === null },
+									{ 'calendar-grid__day--today': isToday },
+									{ 'calendar-grid__day--has-event': !!dayEvents },
+								]}
+								title={dayEvents?.map((e) => e.title).join(', ')}
+							>
+								{day !== null && <span class="calendar-grid__day-number">{day}</span>}
+								{dayEvents && <span class="calendar-grid__dot" aria-hidden="true" />}
+							</div>
+						);
+					})
+				)
+			}
+		</div>
+		<p class="calendar__grid-legend">
+			<span class="calendar__grid-legend-dot" aria-hidden="true" /> Día con actividad
+		</p>
+	</div>
+
+	<button type="button" class="calendar__toggle" id="calendar-toggle">
+		Ver como calendario 📅
+	</button>
 </section>
+
+<script>
+	const listView = document.getElementById('calendar-list-view');
+	const gridView = document.getElementById('calendar-grid-view');
+	const toggleButton = document.getElementById('calendar-toggle');
+
+	toggleButton?.addEventListener('click', () => {
+		const showingGrid = !gridView?.hidden;
+		if (listView) listView.hidden = !showingGrid;
+		if (gridView) gridView.hidden = showingGrid;
+		if (toggleButton) {
+			toggleButton.textContent = showingGrid ? 'Ver como calendario 📅' : 'Ver como lista 📋';
+		}
+	});
+</script>
 
 <style>
 	.calendar {
@@ -65,10 +148,13 @@ const events: CalendarEvent[] = [
 		list-style: none;
 		margin: 0;
 		padding: 0;
-		display: flex;
 		flex-direction: column;
 		gap: 0.75rem;
 		text-align: left;
+	}
+
+	.calendar__list:not([hidden]) {
+		display: flex;
 	}
 
 	.calendar-item {
@@ -117,5 +203,101 @@ const events: CalendarEvent[] = [
 		margin: 0.15rem 0 0;
 		font-size: 0.85rem;
 		color: #666666;
+	}
+
+	.calendar__toggle {
+		margin-top: 1.5rem;
+		padding: 0.65rem 1.5rem;
+		font-size: 0.95rem;
+		font-weight: 600;
+		color: #8a1c2b;
+		background: #fffaf9;
+		border: 1px solid #8a1c2b;
+		border-radius: 999px;
+		cursor: pointer;
+	}
+
+	.calendar__toggle:hover {
+		background: #8a1c2b;
+		color: #ffffff;
+	}
+
+	.calendar__grid-view {
+		text-align: left;
+	}
+
+	.calendar__grid-month {
+		margin: 0 0 0.75rem;
+		font-weight: 700;
+		text-align: center;
+		color: #1a1a1a;
+	}
+
+	.calendar-grid {
+		display: grid;
+		grid-template-columns: repeat(7, 1fr);
+		gap: 4px;
+	}
+
+	.calendar-grid__weekday {
+		text-align: center;
+		font-size: 0.75rem;
+		font-weight: 700;
+		color: #8a1c2b;
+		padding-bottom: 0.35rem;
+	}
+
+	.calendar-grid__day {
+		aspect-ratio: 1;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		border-radius: 8px;
+		background: #fffaf9;
+		border: 1px solid #f0e6e6;
+		font-size: 0.8rem;
+		color: #333333;
+	}
+
+	.calendar-grid__day--empty {
+		background: transparent;
+		border-color: transparent;
+	}
+
+	.calendar-grid__day--today {
+		border-color: #8a1c2b;
+		border-width: 2px;
+		font-weight: 700;
+	}
+
+	.calendar-grid__day--has-event {
+		background: #f6e4e6;
+	}
+
+	.calendar-grid__dot {
+		width: 5px;
+		height: 5px;
+		border-radius: 50%;
+		background: #8a1c2b;
+		margin-top: 2px;
+	}
+
+	.calendar__grid-legend {
+		display: flex;
+		align-items: center;
+		gap: 0.4rem;
+		justify-content: center;
+		margin: 0.85rem 0 0;
+		font-size: 0.8rem;
+		color: #666666;
+	}
+
+	.calendar__grid-legend-dot {
+		width: 8px;
+		height: 8px;
+		border-radius: 50%;
+		background: #8a1c2b;
+		display: inline-block;
 	}
 </style>
