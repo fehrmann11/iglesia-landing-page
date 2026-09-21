@@ -10,24 +10,24 @@ const ministries: Ministry[] = [
 		name: 'Reunión General',
 		description:
 			'Nuestro encuentro principal de toda la congregación: alabanza, predicación y comunión.',
-		schedule: 'Consulta horarios',
+		schedule: 'Ver horario',
 	},
 	{
 		name: 'Mesa Kids',
 		description:
 			'Un espacio especialmente diseñado para que los más pequeños aprendan y se diviertan mientras conocen de Dios.',
-		schedule: 'Consulta horarios',
+		schedule: 'Ver horario',
 	},
 	{
 		name: 'Reunión de Jóvenes',
 		description: 'Un espacio para jóvenes: adoración, estudio bíblico y comunidad.',
-		schedule: 'Consulta horarios',
+		schedule: 'Ver horario',
 	},
 	{
 		name: 'Reunión de Mujeres',
 		description:
 			'Un espacio de comunión, oración y crecimiento espiritual para las mujeres de la iglesia.',
-		schedule: 'Consulta horarios',
+		schedule: 'Ver horario',
 	},
 ];
 ---
@@ -42,7 +42,9 @@ const ministries: Ministry[] = [
 				<article class="ministry-card">
 					<h3 class="ministry-card__name">{ministry.name}</h3>
 					<p class="ministry-card__description">{ministry.description}</p>
-					<p class="ministry-card__schedule">{ministry.schedule}</p>
+					<a class="ministry-card__schedule" href="#calendario">
+						{ministry.schedule} ↓
+					</a>
 				</article>
 			))
 		}
@@ -99,10 +101,16 @@ const ministries: Ministry[] = [
 	}
 
 	.ministry-card__schedule {
+		display: inline-block;
 		margin: 0;
 		font-size: 0.85rem;
 		font-weight: 600;
+		text-decoration: none;
 		color: #8a1c2b;
+	}
+
+	.ministry-card__schedule:hover {
+		text-decoration: underline;
 	}
 
 	@media (min-width: 640px) {
