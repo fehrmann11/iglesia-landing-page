@@ -1,0 +1,65 @@
+---
+interface Photo {
+	src: string;
+	alt: string;
+}
+
+const baseUrl = import.meta.env.BASE_URL.replace(/\/?$/, '/');
+
+const photos: Photo[] = [
+	{ src: 'culto-casa-nueva.jpg', alt: 'Reunión en la nueva casa de la iglesia' },
+	{ src: 'equipo-arreglando-casa.jpg', alt: 'Equipo de voluntarios arreglando la nueva casa' },
+	{ src: 'ceremonia-mesa-kids.jpg', alt: 'Ceremonia de graduación de Mesa Kids' },
+];
+---
+
+<section class="gallery">
+	<h2 class="gallery__title">Momentos de Nuestra Comunidad</h2>
+
+	<div class="gallery__grid">
+		{
+			photos.map((photo) => (
+				<img
+					class="gallery__photo"
+					src={`${baseUrl}images/${photo.src}`}
+					alt={photo.alt}
+					loading="lazy"
+				/>
+			))
+		}
+	</div>
+</section>
+
+<style>
+	.gallery {
+		max-width: 1100px;
+		margin: 0 auto;
+		text-align: center;
+	}
+
+	.gallery__title {
+		margin: 0 0 1.5rem;
+		font-size: 1.75rem;
+		font-weight: 700;
+		color: #1a1a1a;
+	}
+
+	.gallery__grid {
+		display: grid;
+		grid-template-columns: 1fr;
+		gap: 1rem;
+	}
+
+	.gallery__photo {
+		width: 100%;
+		height: 260px;
+		object-fit: cover;
+		border-radius: 12px;
+	}
+
+	@media (min-width: 640px) {
+		.gallery__grid {
+			grid-template-columns: repeat(3, 1fr);
+		}
+	}
+</style>
