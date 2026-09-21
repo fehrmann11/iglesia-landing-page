@@ -18,7 +18,8 @@ Read `docs/specs/changes/add-church-landing-page/tasks.md` before picking up wor
 - **Phase 5 — Assembly & responsive QA: done.** Hero + Ministries + Gallery assembled in `index.astro`. Mobile responsiveness verified by the maintainer on a real phone (LAN IP) since browser-automation viewport resizing was unreliable in this environment — see git history for details if that ever needs revisiting.
 - **Phase 6 — CI/CD: done. Site is live.** `.github/workflows/deploy.yml` builds with `withastro/action` (pinned to Node 22 — Astro 7 requires >=22.12, GH runners default to Node 20) and deploys via `actions/deploy-pages` on push to `main`. Repo visibility switched to **public** (GitHub Pages is not available on private repos on the Free plan). `main`'s `github-pages` environment deployment-branch-policy was updated to allow `main` (GitHub defaulted it to `develop`, the repo's default branch, when Pages was first enabled). Live at **https://fehrmann11.github.io/iglesia-landing-page/**.
 - **Branching model going forward:** feature branches → `develop` (day-to-day work) → fast-forward `develop` into `main` when ready to publish (pushing `main` is what triggers the deploy).
-- Iteration 1 (MVP) tasks.md is now fully complete — see `docs/roadmap.md` for Iteration 2+ (carousel, events, prédicas, editable calendar, donations).
+- **Phase 3.5 — Calendar section: done, added after initial MVP review.** `src/components/Calendar.astro`: static list (date badge + weekday/time), wired into `index.astro` between Ministries and Gallery. **Dates are illustrative/sample data (late Sept), not real** — replace before sharing the link widely. Third-party (non-git) editing of the calendar is still a Iteration 2 open decision — see `docs/roadmap.md`.
+- Iteration 1 (MVP) tasks.md is now fully complete — see `docs/roadmap.md` for Iteration 2+ (carousel, events, prédicas, calendar third-party editing, donations).
 
 ## Development
 

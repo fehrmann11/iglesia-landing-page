@@ -1,0 +1,121 @@
+---
+// Placeholder/sample dates for visualization purposes — replace with real activities.
+interface CalendarEvent {
+	day: string;
+	month: string;
+	weekday: string;
+	time: string;
+	title: string;
+}
+
+const events: CalendarEvent[] = [
+	{ day: '23', month: 'Sep', weekday: 'Martes', time: '19:00', title: 'Reunión de Mujeres' },
+	{ day: '26', month: 'Sep', weekday: 'Viernes', time: '19:30', title: 'Reunión de Jóvenes' },
+	{ day: '27', month: 'Sep', weekday: 'Sábado', time: '16:00', title: 'Mesa Kids' },
+	{ day: '28', month: 'Sep', weekday: 'Domingo', time: '11:00', title: 'Reunión General' },
+	{ day: '30', month: 'Sep', weekday: 'Martes', time: '19:00', title: 'Noche de Oración' },
+];
+---
+
+<section class="calendar" id="calendario">
+	<h2 class="calendar__title">Próximas Actividades</h2>
+	<p class="calendar__intro">No te pierdas lo que viene esta semana.</p>
+
+	<ul class="calendar__list">
+		{
+			events.map((event) => (
+				<li class="calendar-item">
+					<div class="calendar-item__date">
+						<span class="calendar-item__day">{event.day}</span>
+						<span class="calendar-item__month">{event.month}</span>
+					</div>
+					<div class="calendar-item__info">
+						<p class="calendar-item__title">{event.title}</p>
+						<p class="calendar-item__meta">
+							{event.weekday} · {event.time} hrs
+						</p>
+					</div>
+				</li>
+			))
+		}
+	</ul>
+</section>
+
+<style>
+	.calendar {
+		max-width: 700px;
+		margin: 0 auto;
+		text-align: center;
+	}
+
+	.calendar__title {
+		margin: 0 0 0.5rem;
+		font-size: 1.75rem;
+		font-weight: 700;
+		color: #1a1a1a;
+	}
+
+	.calendar__intro {
+		margin: 0 0 2rem;
+		color: #555555;
+		font-size: 1rem;
+	}
+
+	.calendar__list {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		display: flex;
+		flex-direction: column;
+		gap: 0.75rem;
+		text-align: left;
+	}
+
+	.calendar-item {
+		display: flex;
+		align-items: center;
+		gap: 1rem;
+		border: 1px solid #eadfdf;
+		border-radius: 12px;
+		padding: 0.85rem 1.25rem;
+		background: #fffaf9;
+	}
+
+	.calendar-item__date {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		flex-shrink: 0;
+		width: 56px;
+		height: 56px;
+		border-radius: 10px;
+		background: #8a1c2b;
+		color: #ffffff;
+	}
+
+	.calendar-item__day {
+		font-size: 1.15rem;
+		font-weight: 700;
+		line-height: 1;
+	}
+
+	.calendar-item__month {
+		font-size: 0.7rem;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+	}
+
+	.calendar-item__title {
+		margin: 0;
+		font-size: 1rem;
+		font-weight: 700;
+		color: #1a1a1a;
+	}
+
+	.calendar-item__meta {
+		margin: 0.15rem 0 0;
+		font-size: 0.85rem;
+		color: #666666;
+	}
+</style>
