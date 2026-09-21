@@ -1,0 +1,109 @@
+---
+const baseUrl = import.meta.env.BASE_URL.replace(/\/?$/, '/');
+---
+
+<section class="hero">
+	<img
+		class="hero__background"
+		src={`${baseUrl}images/hero-cover.jpg`}
+		alt=""
+		aria-hidden="true"
+	/>
+	<div class="hero__overlay"></div>
+
+	<div class="hero__content">
+		<img
+			class="hero__logo"
+			src={`${baseUrl}images/logo.png`}
+			alt="Logo de Casa de Restauración"
+			width="112"
+			height="112"
+		/>
+		<h1 class="hero__title">Casa de Restauración</h1>
+		<p class="hero__description">
+			Somos una comunidad de fe donde encontrarás un lugar para crecer, conectar y ser parte
+			de una familia. Te esperamos con las puertas abiertas.
+		</p>
+	</div>
+</section>
+
+<style>
+	.hero {
+		position: relative;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		min-height: 70vh;
+		padding: 3rem 1.25rem;
+		text-align: center;
+		overflow: hidden;
+	}
+
+	.hero__background {
+		position: absolute;
+		inset: 0;
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		filter: blur(3px);
+		transform: scale(1.05);
+		z-index: -2;
+	}
+
+	.hero__overlay {
+		position: absolute;
+		inset: 0;
+		background: linear-gradient(180deg, rgba(20, 10, 10, 0.7), rgba(20, 10, 10, 0.85));
+		z-index: -1;
+	}
+
+	.hero__content {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 0.75rem;
+		max-width: 640px;
+	}
+
+	.hero__logo {
+		width: 84px;
+		height: 84px;
+		border-radius: 50%;
+		margin-bottom: 0.5rem;
+	}
+
+	.hero__title {
+		margin: 0;
+		font-size: 2rem;
+		font-weight: 700;
+		color: #ffffff;
+	}
+
+	.hero__description {
+		margin: 0.5rem 0 0;
+		font-size: 1rem;
+		line-height: 1.6;
+		color: #f0f0f0;
+	}
+
+	@media (min-width: 768px) {
+		.hero {
+			min-height: 80vh;
+			padding: 4rem 2rem;
+		}
+
+		.hero__logo {
+			width: 112px;
+			height: 112px;
+		}
+
+		.hero__title {
+			font-size: 3rem;
+		}
+
+		.hero__description {
+			font-size: 1.125rem;
+		}
+	}
+</style>
